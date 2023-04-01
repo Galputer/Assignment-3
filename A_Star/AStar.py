@@ -1,3 +1,7 @@
+########
+## Group 16 Astar code with alterations from group 17
+########
+
 from Algorithm import Algorithm
 from queue import PriorityQueue
 import time
