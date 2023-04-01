@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 def ml(args):
 
     # Load the a different dataset based on our boardsS
-    ## what cormat does sklearn need for the dataset?
+    ## we need a panda dataset, input from the Main.py script
     iris = load_iris()
     X, y = iris.data, iris.target
 
