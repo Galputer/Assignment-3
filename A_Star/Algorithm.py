@@ -1,3 +1,7 @@
+########
+## Group 16 Astar code with alterations from group 17
+########
+
 from abc import abstractmethod, ABC
 from enum import Enum
 

@@ -1,3 +1,7 @@
+########
+## Group 16 Astar code with alterations from group 17
+########
+
 import numpy as np
 from Algorithm import Direction
 from copy import deepcopy
