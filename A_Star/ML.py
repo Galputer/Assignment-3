@@ -21,11 +21,15 @@ def ml(args):
         if os.path.isfile(f):
             df = pd.read_csv(f)
             boardnums = df.to_numpy()
-            ace_calc = boardnums[len(boardnums)-1]
-            boardnums = np.delete(boardnums, -1)
-            tempDF = pd.DataFrame({'matrix': boardnums, 'astar_calc':ace_calc})
-            testData.append(tempDF, ignore_index=True)
-        
+            if(len(boardnums) == 10):
+                ace_calc = boardnums[len(boardnums)-1]
+                boardnums = np.delete(boardnums, -1)
+                tempDF = pd.DataFrame({'matrix': boardnums, 'astar_calc':ace_calc})
+                testData.append(tempDF, ignore_index=True)
+                print("this should have added the dataframe board to the overall dataframe set")
+    # Define the target and data columns
+    target_col = 'astar_calc'
+    data_col = 'matrix'
     X, y = testData.data, testData.target
 
     # Split the dataset into training and testing sets
@@ -38,3 +42,5 @@ def ml(args):
     # Evaluate the accuracy of the classifier on the testing set
     accuracy = clf.score(X_test, y_test)
     print(f"Accuracy: {accuracy}")
+    
+ml(args=[""])
