@@ -4,16 +4,15 @@ import pandas as pd
 
 def parse_board():
     directory = 'board-data'
-    board_df = pd.DataFrame(columns=["board","astar"])
+    board_df = pd.DataFrame(columns=["board","astar","b_count"])
 
     for filename in os.listdir(directory):
         f = os.path.join(directory, filename)
         # checking if it is a file
         if os.path.isfile(f):
-            board_data,a_star = read_file(f)
-            board_df.loc[len(board_df)] = [board_data, a_star]
+            board_data,a_star,b_count = read_file(f)
+            board_df.loc[len(board_df)] = [board_data, a_star, b_count]
 
-    print(board_df.loc[:10].to_string(index=False))
     return board_df
     
 def read_file(file_path):
@@ -38,7 +37,7 @@ def read_file(file_path):
                 B_count += 1
     board_data = data[:-1]
     a_star = data[-1]
-    return board_data,a_star
+    return board_data,a_star,B_count
 
 if __name__ == "__main__":
     parse_board()
