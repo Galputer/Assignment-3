@@ -115,3 +115,18 @@ class Algorithm(ABC):
     def _manhattan_distance_to_goal(self, location, value, front):
         location_2 = self.goal_state_front_blanks[value] if front else self.goal_state_back_blanks[value]
         return abs(location[0] - location_2[0]) + abs(location[1] - location_2[1])
+
+        #Cooper's addition, serpent feature
+    
+    def adjasentToPreAndSubsequentTiles(self, location, value, front):
+        #relPos = [-1,0,1]
+        #relRow = -1
+        preAndSubsequentAdj = 0
+        neighbors = self._neighbors(location[0],location[1])
+        for adjasent in neighbors:
+            if value == neighbors[adjasent].value + 1:
+                preAndSubsequentAdj = preAndSubsequentAdj + 1
+            if value == neighbors[adjasent].value - 1:
+                preAndSubsequentAdj = preAndSubsequentAdj + 1
+        return preAndSubsequentAdj
+
