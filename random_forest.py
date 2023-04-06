@@ -1,4 +1,6 @@
+from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.tree import plot_tree
 from feature_engineer import feature_engineer
 from parse_board import parse_board
 
@@ -34,3 +36,18 @@ if __name__ == "__main__":
     
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     print("Test RMSE: {:.2f}".format(rmse))
+    
+    #draw tree graph
+    # Visualize the first decision tree in the Random Forest
+    plt.figure(figsize=(20, 10))
+    plot_tree(model.estimators_[0], feature_names=X.columns, filled=True)
+    plt.show()
+
+    # Visualize the feature importances of the Random Forest
+    plt.figure(figsize=(10, 6))
+    plt.bar(X.columns, model.feature_importances_)
+    plt.xticks(rotation=90)
+    plt.xlabel('Features')
+    plt.ylabel('Importance')
+    plt.title('Feature Importances')
+    plt.show()
