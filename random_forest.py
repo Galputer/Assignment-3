@@ -4,7 +4,7 @@ from parse_board import parse_board
 
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
-S
+
 import numpy as np
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ def parse_board():
     for filename in os.listdir(directory):
         f = os.path.join(directory, filename)
         # checking if it is a file
-        if os.path.isfile(f):
+        if os.path.isfile(f) and 'csv' in filename:
             board_data,a_star,b_count = read_file(f)
             board_df.loc[len(board_df)] = [board_data, a_star, b_count]
 
