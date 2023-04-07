@@ -10,12 +10,10 @@ import numpy as np
 if __name__ == "__main__":
     board_df = parse_board()
     engineered_df = feature_engineer(board_df)
-    # print(engineered_df.loc[:10].to_string(index=False))
     
     # Select the relevant features and target variable
     X = engineered_df
     y = board_df['astar']
-    # print(X.loc[:10].to_string(index=False))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     # Create a Lasso regression model
     model = Lasso(alpha=0.1)
