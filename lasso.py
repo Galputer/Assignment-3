@@ -1,34 +1,42 @@
+from statistics import mean, median
+
 from feature_engineer import feature_engineer
 from parse_board import parse_board
 
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.linear_model import Lasso
+from sklearn.model_selection import cross_validate
 
 import numpy as np
 
 if __name__ == "__main__":
+    print(f'{"Reading board data" :=<100}')
     board_df = parse_board()
+    print(f'{"Generating features" :=<100}')
     engineered_df = feature_engineer(board_df)
     
+    print(f'{"Running random forest" :=<100}')
     # Select the relevant features and target variable
     X = engineered_df
     y = board_df['astar']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
     # Create a Lasso regression model
     model = Lasso(alpha=0.1)
 
-    # Fit the model to the data
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    # y_pred = [int(i) for i in y_pred]
-    
-    # evaluate model
-    train_r2 = model.score(X_train, y_train)
-    test_r2 = model.score(X_test, y_test)
-    
-    print("Train R^2: {:.2f}".format(train_r2))
-    print("Test R^2: {:.2f}".format(test_r2))
-    
-    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    print("Test RMSE: {:.2f}".format(rmse))
+    # Fit and evaluate the model using 10-fold cross-validation
+    scores = cross_validate(model, X, y, cv=10, scoring=["r2","neg_root_mean_squared_error"])
+    print(f'{"Generating random forest statistics" :=<100}')
+
+    # print("Cross-validation scores:", scores)
+    print("Cross-validation mean RMSE: {:.2f}".format(0- mean(scores['test_neg_root_mean_squared_error'])))
+    print("Cross-validation median RMSE: {:.2f}".format(0- median(scores['test_neg_root_mean_squared_error'])))
+
+    print("Cross-validation mean R-squared: {:.2f}".format(mean(scores['test_r2'])))
+    print("Cross-validation median R-squared: {:.2f}".format(median(scores['test_r2'])))
+
+    # Calculate RMSE for the entire dataset
+    model.fit(X, y)
+    y_pred = model.predict(X)
+    rmse = np.sqrt(mean_squared_error(y, y_pred))
+    print("Model RMSE: {:.2f}".format(rmse))
+    print("Model R-squared: {:.2f}".format(r2_score(y, y_pred)))
