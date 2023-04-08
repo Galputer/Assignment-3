@@ -128,6 +128,7 @@ def feature_engineer(df: pd.DataFrame):
     
     # return df[['tile_sum','correct_1','correct_2','correct_count','incorrect_sum_1','incorrect_sum_2','incorrect_sum','manhattan_1','manhattan_2','manhattan','conflicts_1','conflicts_2','conflicts']]
     return df[['tile_sum','correct_count','inversion','incorrect_sum','manhattan','conflicts']]
+
 if __name__ == "__main__":
     # board_1d = np.array(['B', 'B', 5, 3, 10, 6, 11, 7, 4, 8, 9, 16, 12, 'B', 13, 15])
     # board_sorted = [3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 15, 16]
