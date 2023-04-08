@@ -154,5 +154,39 @@ if __name__ == "__main__":
     engineered_df = feature_engineer(board_df)
     print(engineered_df.loc[:10].to_string(index=False))
     print(engineered_df.shape[0])
+
+       #Cooper's addition, serpent feature
+    
+    def adjasentToPreAndSubsequentTiles(self, location, value, front):
+        preAndSubsequentAdjList = [] 
+        preAndSubsequentAdj = 0
+        neighbors = self._neighbors(location[0],location[1])
+        for adjasent in neighbors:
+            if value == neighbors[adjasent].value + 1:
+                preAndSubsequentAdj = preAndSubsequentAdj + 1
+                preAndSubsequentAdjList.append(neighbors[adjasent])
+            if value == neighbors[adjasent].value - 1:
+                preAndSubsequentAdj = preAndSubsequentAdj + 1
+                preAndSubsequentAdjList.append(neighbors[adjasent])
+        return preAndSubsequentAdjList
+    
+    def totalAdjasentToPreAndSubsequentTiles(self):#, location, value, front):
+        #longestChain = 0
+        #currentChain = 0
+        longestList = []
+        currentList = []
+        for tile in (board.length):
+            adjToTile = self.adjasentToPreAndSubsequentTiles(self, location, value, front)
+            if len(adjToTile) == 0:
+                chainList = []
+            else:
+                chainList.append(adjToTile)
+                #remove duplicates
+                chainList= [*set(chainList)]
+            if len(longestList) < len(currentList):
+                #longestChain = currentChain
+                longestList = currentList
+            return longestList
+        
     
     
