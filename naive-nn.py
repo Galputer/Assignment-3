@@ -1,4 +1,5 @@
 from math import sqrt
+import os
 from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
@@ -99,3 +100,12 @@ with torch.no_grad():
     test_loss = criterion(outputs.squeeze(), y)
 
 print(f"Model RMSE: {sqrt(test_loss.item()):.4f}")
+
+# Save the model as a pt file
+dir_path = os.path.dirname(os.path.realpath(__file__))
+filename = 'models/nn.pt'
+if os.path.isfile(os.path.join(dir_path,filename)):
+    print(f'{"Model exists!" :=<100}')
+else:
+    print(f'{"Saving model to disk" :=<100}')
+    torch.save(model.state_dict(), os.path.join(dir_path,filename))

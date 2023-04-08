@@ -1,3 +1,5 @@
+import os
+import pickle
 from statistics import mean, median
 
 from feature_engineer import feature_engineer
@@ -15,7 +17,7 @@ if __name__ == "__main__":
     print(f'{"Generating features" :=<100}')
     engineered_df = feature_engineer(board_df)
     
-    print(f'{"Running random forest" :=<100}')
+    print(f'{"Running lasso" :=<100}')
     # Select the relevant features and target variable
     X = engineered_df
     y = board_df['astar']
@@ -25,7 +27,7 @@ if __name__ == "__main__":
 
     # Fit and evaluate the model using 10-fold cross-validation
     scores = cross_validate(model, X, y, cv=10, scoring=["r2","neg_root_mean_squared_error"])
-    print(f'{"Generating random forest statistics" :=<100}')
+    print(f'{"Generating lasso statistics" :=<100}')
 
     # print("Cross-validation scores:", scores)
     print("Cross-validation mean RMSE: {:.2f}".format(0- mean(scores['test_neg_root_mean_squared_error'])))
@@ -40,3 +42,13 @@ if __name__ == "__main__":
     rmse = np.sqrt(mean_squared_error(y, y_pred))
     print("Model RMSE: {:.2f}".format(rmse))
     print("Model R-squared: {:.2f}".format(r2_score(y, y_pred)))
+    
+    # Save the model as a pickle file
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    filename = 'models/lasso.pkl'
+    if os.path.isfile(os.path.join(dir_path,filename)):
+        print(f'{"Model exists!" :=<100}')
+    else:
+        print(f'{"Saving model to disk" :=<100}')
+        with open(os.path.join(dir_path,filename), 'wb') as file:
+            pickle.dump(model, file)

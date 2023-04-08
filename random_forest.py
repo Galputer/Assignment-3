@@ -1,3 +1,5 @@
+import os
+import pickle
 from statistics import mean, median
 from matplotlib import pyplot as plt
 
@@ -43,6 +45,17 @@ if __name__ == "__main__":
     print("Model R-squared: {:.2f}".format(r2_score(y, y_pred)))
     
     print(f'{"Generating random forest regressor graphs" :=<100}')
+    
+    # Save the model as a pickle file
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    filename = 'models/random-forest.pkl'
+    if os.path.isfile(os.path.join(dir_path,filename)):
+        print(f'{"Model exists!" :=<100}')
+    else:
+        print(f'{"Saving model to disk" :=<100}')
+        with open(os.path.join(dir_path,filename), 'wb') as file:
+            pickle.dump(model, file)
+    
     #draw tree graph
     # Visualize the first decision tree in the Random Forest
     plt.figure(figsize=(20, 10))
