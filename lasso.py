@@ -45,7 +45,7 @@ if __name__ == "__main__":
     
     # Save the model as a pickle file
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = 'models/lasso.pkl'
+    filename = 'models/lasso-2.pkl'
     if os.path.isfile(os.path.join(dir_path,filename)):
         print(f'{"Model exists!" :=<100}')
     else:
