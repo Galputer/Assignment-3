@@ -102,6 +102,16 @@ def inversions_count_2(board):
                 inversions += 1
     return inversions
 
+def hamming_distance(board, goal):
+    """
+    Calculates the Hamming distance between two boards.
+    """
+    distance = 0
+    for i in range(len(board)):
+        if board[i] != "B" and goal[i] != "B" and board[i] != int(goal[i]):
+            distance += board[i]
+    return distance
+
 def feature_engineer(df: pd.DataFrame):
     df['board_size'] = df['board'].apply(len)
     df['n'] = df['board_size'].apply(isqrt)
@@ -124,10 +134,12 @@ def feature_engineer(df: pd.DataFrame):
     df['inversion_1'] = df.apply(lambda x: inversions_count_1(x.board), axis=1)
     df['inversion_2'] = df.apply(lambda x: inversions_count_2(x.board), axis=1)
     df['inversion'] = df.apply(lambda x: min(x.inversion_1, x.inversion_2), axis=1)
-    
+    df['hamming_1'] = df.apply(lambda x: hamming_distance(x.board, x.goal_1), axis=1)
+    df['hamming_2'] = df.apply(lambda x: hamming_distance(x.board, x.goal_2), axis=1)
+    df['hamming'] = df.apply(lambda x: min(x.hamming_1, x.hamming_2), axis=1)
     
     # return df[['tile_sum','correct_1','correct_2','correct_count','incorrect_sum_1','incorrect_sum_2','incorrect_sum','manhattan_1','manhattan_2','manhattan','conflicts_1','conflicts_2','conflicts']]
-    return df[['tile_sum','correct_count','inversion','incorrect_sum','manhattan','conflicts']]
+    return df[['tile_sum','correct_count','inversion','incorrect_sum','manhattan','conflicts','hamming']]
 
 if __name__ == "__main__":
     # board_1d = np.array(['B', 'B', 5, 3, 10, 6, 11, 7, 4, 8, 9, 16, 12, 'B', 13, 15])

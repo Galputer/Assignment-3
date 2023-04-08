@@ -11,11 +11,11 @@ from parse_board import parse_board
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = nn.Sequential(
-    nn.Linear(6, 10),
+    nn.Linear(7, 14),
     nn.LeakyReLU(),
     nn.Dropout(0.5),
     
-    nn.Linear(10, 1)
+    nn.Linear(14, 1)
 )
 
 # move model to device
