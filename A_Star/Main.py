@@ -2,6 +2,7 @@
 ## Group 16 Astar code with alterations from group 17
 ########
 
+import os
 import pandas as pd
 import sys
 
@@ -14,7 +15,7 @@ COMMAND_ARGUMENT_ASTAR = "npuzzle"
 
 def main(argv):
 
-    command_format = "\ncommands: [npuzzle] [board file] [sliding/teleporting/greedy] [true/false]"
+    command_format = "\ncommands: [npuzzle] [board file] [sliding/teleporting/greedy/learned] [true/false]"
 
     print(command_format)
 
@@ -31,8 +32,10 @@ def main(argv):
         board = None
 
         try:
-            directory = './Boards/' + argv[1]
-            board = Board(pd.read_csv(directory, sep=',', header=None).replace('B', 0).values.astype(int))
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            file_path = 'Boards/' + argv[1]
+            file_path = os.path.join(dir_path,file_path)
+            board = Board(pd.read_csv(file_path, sep=',', header=None).replace('B', 0).values.astype(int))
 
         except Exception as e:
             print(e, command_format)
@@ -54,7 +57,7 @@ def main(argv):
             elif bool == "false":
                 weight = False
 
-            if not heuristic.lower() in [Algorithm.HEURISTIC_TELEPORT, Algorithm.HEURISTIC_SLIDE]:
+            if not heuristic.lower() in [Algorithm.HEURISTIC_TELEPORT, Algorithm.HEURISTIC_SLIDE, Algorithm.HEURISTIC_LEARNED]:
                 print("Unknown heuristic for command argument 2", command_format)
                 continue
 

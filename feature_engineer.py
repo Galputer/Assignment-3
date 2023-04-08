@@ -80,7 +80,7 @@ def linear_conflict(board, goal, n):
                         conflicts += value + other_tile
     return conflicts
 
-def inversions_count_1(board):
+def inversions_count(board):
     """
     Calculates the number of inversions in the given board state.
     """
@@ -88,17 +88,6 @@ def inversions_count_1(board):
     for i in range(len(board)):
         for j in range(i + 1, len(board)):
             if board[i] != 0 and board[j] != 0 and board[i] > board[j]:
-                inversions += 1
-    return inversions
-
-def inversions_count_2(board):
-    """
-    Calculates the number of inversions in the given board state.
-    """
-    inversions = 0
-    for i in range(len(board)):
-        for j in range(i + 1, len(board)):
-            if board[i] != 0 and board[j] != 0 and board[i] < board[j]:
                 inversions += 1
     return inversions
 
@@ -131,9 +120,7 @@ def feature_engineer(df: pd.DataFrame):
     df['conflicts_1'] = df.apply(lambda x: linear_conflict(x.board, x.goal_1, x.n) + x.manhattan_1, axis=1)
     df['conflicts_2'] = df.apply(lambda x: linear_conflict(x.board, x.goal_2, x.n) + x.manhattan_2, axis=1)
     df['conflicts'] = df.apply(lambda x: min(x.conflicts_1, x.conflicts_2), axis=1)
-    df['inversion_1'] = df.apply(lambda x: inversions_count_1(x.board), axis=1)
-    df['inversion_2'] = df.apply(lambda x: inversions_count_2(x.board), axis=1)
-    df['inversion'] = df.apply(lambda x: min(x.inversion_1, x.inversion_2), axis=1)
+    df['inversion'] = df.apply(lambda x: inversions_count(x.board), axis=1)
     df['hamming_1'] = df.apply(lambda x: hamming_distance(x.board, x.goal_1), axis=1)
     df['hamming_2'] = df.apply(lambda x: hamming_distance(x.board, x.goal_2), axis=1)
     df['hamming'] = df.apply(lambda x: min(x.hamming_1, x.hamming_2), axis=1)

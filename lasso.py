@@ -19,8 +19,8 @@ if __name__ == "__main__":
     
     print(f'{"Running lasso" :=<100}')
     # Select the relevant features and target variable
-    X = engineered_df
-    y = board_df['astar']
+    X = engineered_df.values
+    y = board_df['astar'].values
     
     # Create a Lasso regression model
     model = Lasso(alpha=0.1)
