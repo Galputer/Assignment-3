@@ -12,11 +12,11 @@ from parse_board import parse_board
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = nn.Sequential(
-    nn.Linear(7, 14),
+    nn.Linear(6, 12),
     nn.LeakyReLU(),
     nn.Dropout(0.5),
     
-    nn.Linear(14, 1)
+    nn.Linear(12, 1)
 )
 
 # move model to device
@@ -103,7 +103,7 @@ print(f"Model RMSE: {sqrt(test_loss.item()):.4f}")
 
 # Save the model as a pt file
 dir_path = os.path.dirname(os.path.realpath(__file__))
-filename = 'models/nn.pt'
+filename = 'models/nn-2.pt'
 if os.path.isfile(os.path.join(dir_path,filename)):
     print(f'{"Model exists!" :=<100}')
 else:

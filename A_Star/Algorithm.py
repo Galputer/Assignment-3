@@ -4,9 +4,13 @@
 
 from abc import abstractmethod, ABC
 from enum import Enum
+import os
+from pathlib import Path
+import pickle
 
 HEURISTIC_TELEPORT = "teleporting"
 HEURISTIC_SLIDE = "sliding"
+HEURISTIC_LEARNED = "learned"
 
 
 class Direction(Enum):
@@ -46,12 +50,18 @@ class Algorithm(ABC):
         self.heuristic_type = heuristic
         self.weighted = weighted
         self.goal_state_front_blanks, self.goal_state_back_blanks = self.goal_state(self.board)
+        self.learned_model = self.load_model()
 
     # Driver method for algorithms
     @abstractmethod
     def start(self):
         pass
-
+    
+    def load_model(self):
+        model_path = Path(os.path.dirname(os.path.realpath(__file__))).parent / "models" / "random-forest-2.pkl"
+        loaded_model = pickle.load(open(model_path, 'rb'))
+        return loaded_model
+    
     # to be run once on init, and never again
     def goal_state(self, board):
         arr = []
@@ -79,9 +89,37 @@ class Algorithm(ABC):
             return min(self._calculate_teleport_heuristic(board))
         elif self.heuristic_type == HEURISTIC_SLIDE:
             return min(self._calculate_slide_heuristic(board))
+        elif self.heuristic_type == HEURISTIC_LEARNED:
+            return min(self._calculate_learned_heuristic(board, self.learned_model))
         else:
-            return min(self._calculate_slide_heuristic(board))
+            return min(self._calculate_learned_heuristic(board, self.learned_model))
 
+    def _calculate_learned_heuristic(self, board, model):
+        board1d = [j for sub in board for j in sub]
+        # ['correct_count','inversion','incorrect_sum','manhattan','conflicts','hamming']
+        X_front = []
+        X_back = []
+        X_back.append(self._count_correct_tiles(board, self.goal_state_back_blanks))
+        X_front.append(self._count_correct_tiles(board, self.goal_state_front_blanks))
+        inv = self._inversions_count(board1d)
+        X_back.append(inv)
+        X_front.append(inv)
+        X_back.append(self._sum_incorrect_weight(board, self.goal_state_back_blanks))
+        X_front.append(self._sum_incorrect_weight(board, self.goal_state_front_blanks))
+        manhattan_front, manhattan_back = self._calculate_slide_heuristic(board)
+        X_back.append(manhattan_back)
+        X_front.append(manhattan_front)
+        X_front.append(manhattan_front + self._linear_conflict(board, self.goal_state_front_blanks))
+        X_back.append(manhattan_back + self._linear_conflict(board, self.goal_state_back_blanks))
+
+        X_back.append(self._hamming_distance(board, self.goal_state_back_blanks))
+        X_front.append(self._hamming_distance(board, self.goal_state_front_blanks))
+
+        y = model.predict([X_front,X_back])
+        y_front = y[0]
+        y_back = y[1]
+        return min(manhattan_front,y_front), min(manhattan_back,y_back)
+    
     def _calculate_teleport_heuristic(self, board):
         front_heuristic = 0
         back_heuristic = 0
@@ -115,3 +153,73 @@ class Algorithm(ABC):
     def _manhattan_distance_to_goal(self, location, value, front):
         location_2 = self.goal_state_front_blanks[value] if front else self.goal_state_back_blanks[value]
         return abs(location[0] - location_2[0]) + abs(location[1] - location_2[1])
+    
+    def _count_correct_tiles(self, board, goal):
+        count = 0
+
+        for i in range(len(board)):
+            for j in range(len(board[i])):
+                cur_tile = board[i][j]
+                if cur_tile == 0: continue
+                if i == goal[cur_tile][0] and j == goal[cur_tile][1]: count += 1
+            
+        return count
+    
+    def _inversions_count(self, board):
+        """
+        Calculates the number of inversions in the given board state.
+        """
+        inversions = 0
+        for i in range(len(board)):
+            for j in range(i + 1, len(board)):
+                if board[i] != 0 and board[j] != 0 and board[i] > board[j]:
+                    inversions += 1
+        return inversions
+    
+    def _sum_incorrect_weight(self, board, goal):
+        sum = 0
+
+        for i in range(len(board)):
+            for j in range(len(board[i])):
+                cur_tile = board[i][j]
+                if cur_tile == 0 : continue
+                if (i,j) != goal[cur_tile]: sum += cur_tile
+            
+        return sum
+    
+    def _hamming_distance(self, board, goal):
+        """
+        Calculates the Hamming distance between two boards.
+        """
+        distance = 0
+        for i in range(len(board)):
+            for j in range(len(board[i])):
+                cur_tile = board[i][j]
+                if cur_tile == 0: continue
+                if (i,j) != goal[cur_tile]:
+                    distance += cur_tile
+        return distance
+    
+    def _linear_conflict(self, board, goal):
+        size = len(board)
+        conflict = 0
+
+        # Calculate conflict for rows
+        for i in range(size):
+            for j in range(size):
+                if board[i][j] != 0 and (i,j) != goal[board[i][j]]:
+                    if i == goal[board[i][j]][0]:
+                        for k in range(j + 1, size):
+                            if board[i][k] != 0 and (i,k) != goal[board[i][j]] and goal[board[i][j]][1] < goal[board[i][k]][1]:
+                                conflict += board[i][j] + board[i][k]
+
+        # Calculate conflict for columns
+        for j in range(size):
+            for i in range(size):
+                if board[i][j] != 0 and (i,j) != goal[board[i][j]]:
+                    if j == goal[board[i][j]][1]:
+                        for k in range(i + 1, size):
+                            if board[k][j] != 0 and (k,j) != goal[board[i][j]] and goal[board[i][j]][0] < goal[board[k][j]][0]:
+                                conflict += board[i][j] + board[k][j]
+
+        return conflict

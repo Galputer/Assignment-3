@@ -19,8 +19,8 @@ if __name__ == "__main__":
     
     print(f'{"Running lasso" :=<100}')
     # Select the relevant features and target variable
-    X = engineered_df
-    y = board_df['astar']
+    X = engineered_df.values
+    y = board_df['astar'].values
     
     # Create a Lasso regression model
     model = Lasso(alpha=0.1)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     
     # Save the model as a pickle file
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = 'models/lasso.pkl'
+    filename = 'models/lasso-2.pkl'
     if os.path.isfile(os.path.join(dir_path,filename)):
         print(f'{"Model exists!" :=<100}')
     else:

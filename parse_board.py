@@ -35,7 +35,7 @@ def read_file(file_path):
             if element.isnumeric():
                 data.append(int(element))
             else:
-                data.append(element)
+                data.append(0)
                 B_count += 1
     board_data = data[:-1]
     a_star = data[-1]
@@ -44,7 +44,7 @@ def read_file(file_path):
 def count_B(arr):
     count = 0
     for element in arr:
-        if element == "B": count += 1
+        if element == 0: count += 1
     return count
 
 def read_aggregated():
@@ -58,7 +58,7 @@ def read_aggregated():
             arr = np.genfromtxt(f,
                     delimiter=",", dtype=int)
             lst = arr.tolist() 
-            lst = ['B' if item == -1 else item for row in lst for item in row]
+            lst = [0 if item == -1 else item for row in lst for item in row]
             arr2 = np.array(lst,dtype=object)
             arr2 = np.reshape(arr2,[-1,9])
             lst_board.append(arr2)
@@ -82,5 +82,5 @@ def read_aggregated():
     return df
 
 if __name__ == "__main__":
-    # parse_board()
-    read_aggregated()
+    print(parse_board())
+    # print(read_aggregated())
