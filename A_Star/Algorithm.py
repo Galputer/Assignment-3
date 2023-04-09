@@ -7,6 +7,7 @@ from enum import Enum
 import os
 from pathlib import Path
 import pickle
+import time
 
 HEURISTIC_TELEPORT = "teleporting"
 HEURISTIC_SLIDE = "sliding"
@@ -86,15 +87,20 @@ class Algorithm(ABC):
     # Heuristic functions:
     def _calculate_heuristic(self, board):
         if self.heuristic_type == HEURISTIC_TELEPORT:
-            return min(self._calculate_teleport_heuristic(board))
+            front_heuristic, back_heuristic, calc_time = self._calculate_teleport_heuristic(board)
+            return min(front_heuristic, back_heuristic), calc_time
         elif self.heuristic_type == HEURISTIC_SLIDE:
-            return min(self._calculate_slide_heuristic(board))
+            front_heuristic, back_heuristic, calc_time = self._calculate_slide_heuristic(board)
+            return min(front_heuristic, back_heuristic), calc_time
         elif self.heuristic_type == HEURISTIC_LEARNED:
-            return min(self._calculate_learned_heuristic(board, self.learned_model))
+            front_heuristic, back_heuristic, calc_time = self._calculate_learned_heuristic(board, self.learned_model)
+            return min(front_heuristic, back_heuristic), calc_time
         else:
-            return min(self._calculate_learned_heuristic(board, self.learned_model))
+            front_heuristic, back_heuristic, calc_time = self._calculate_learned_heuristic(board, self.learned_model)
+            return min(front_heuristic, back_heuristic), calc_time
 
     def _calculate_learned_heuristic(self, board, model):
+        start_time = time.time()
         board1d = [j for sub in board for j in sub]
         # ['correct_count','inversion','incorrect_sum','manhattan','conflicts','hamming']
         X_front = []
@@ -118,9 +124,10 @@ class Algorithm(ABC):
         y = model.predict([X_front,X_back])
         y_front = y[0]
         y_back = y[1]
-        return min(manhattan_front,y_front), min(manhattan_back,y_back)
+        return min(manhattan_front,y_front), min(manhattan_back,y_back), time.time()-start_time
     
     def _calculate_teleport_heuristic(self, board):
+        start_time = time.time()
         front_heuristic = 0
         back_heuristic = 0
         for x in range(len(board)):
@@ -134,9 +141,10 @@ class Algorithm(ABC):
                     front_heuristic += 1 * (current if self.weighted else 1)
                 if (x, y) != back_blank_coordinates:
                     back_heuristic += 1 * (current if self.weighted else 1)
-        return front_heuristic, back_heuristic
+        return front_heuristic, back_heuristic, time.time()-start_time
 
     def _calculate_slide_heuristic(self, board):
+        start_time = time.time()
         front_heuristic = 0
         back_heuristic = 0
         for x in range(len(board)):
@@ -148,7 +156,7 @@ class Algorithm(ABC):
                     current if self.weighted else 1)
                 back_heuristic += self._manhattan_distance_to_goal((x, y), current, False) * (
                     current if self.weighted else 1)
-        return front_heuristic, back_heuristic
+        return front_heuristic, back_heuristic, time.time()-start_time
 
     def _manhattan_distance_to_goal(self, location, value, front):
         location_2 = self.goal_state_front_blanks[value] if front else self.goal_state_back_blanks[value]
