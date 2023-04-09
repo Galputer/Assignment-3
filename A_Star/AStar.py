@@ -25,9 +25,13 @@ class AStar(Algorithm):
         self._print_path(end)
 
     def search(self):
-
+        total_runs = 0
+        total_time = 0
         fringe = PriorityQueue()
-        fringe.put((self._calculate_heuristic(self.board), self.board))
+        heuristic, calc_time = self._calculate_heuristic(self.board)
+        total_runs+=1
+        total_time+=calc_time
+        fringe.put((heuristic, self.board))
         visited = dict()
 
         start_time = time.time()
@@ -36,14 +40,23 @@ class AStar(Algorithm):
 
             self.nodes_expanded += 1
 
-            if self._calculate_heuristic(current) == 0:
+            heuristic, calc_time = self._calculate_heuristic(current)
+            total_runs+=1
+            total_time+=calc_time
+            
+            if heuristic == 0:
+                print("Average heuristic calculation time:")
+                print(total_time/total_runs)
                 self.elapsed_time = time.time() - start_time
                 return current
 
             for board in current.neighbors():
                 if board not in visited or board.cost < visited[board]:
                     visited[current] = current.cost
-                    priority = board.cost + self._calculate_heuristic(board)
+                    heuristic, calc_time = self._calculate_heuristic(board)
+                    total_time+=calc_time
+                    total_runs+=1
+                    priority = board.cost + heuristic
                     fringe.put((priority, board))
 
     def _create_path_string(self, goal):
