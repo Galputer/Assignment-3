@@ -59,7 +59,7 @@ class Algorithm(ABC):
         pass
     
     def load_model(self):
-        model_path = Path(os.path.dirname(os.path.realpath(__file__))).parent / "models" / "random-forest-2.pkl"
+        model_path = Path(os.path.dirname(os.path.realpath(__file__))).parent / "models" / "lasso-3.pkl"
         loaded_model = pickle.load(open(model_path, 'rb'))
         return loaded_model
     
@@ -102,17 +102,18 @@ class Algorithm(ABC):
     def _calculate_learned_heuristic(self, board, model):
         start_time = time.time()
         board1d = [j for sub in board for j in sub]
-        # ['correct_count','inversion','incorrect_sum','manhattan','conflicts','hamming']
+        # ['incorrect_count','inversion','incorrect_sum','manhattan','conflicts','hamming']
         X_front = []
         X_back = []
-        X_back.append(self._count_correct_tiles(board, self.goal_state_back_blanks))
-        X_front.append(self._count_correct_tiles(board, self.goal_state_front_blanks))
+        temp1 = self._count_incorrect_tiles(board, self.goal_state_back_blanks)
+        temp2 = self._count_incorrect_tiles(board, self.goal_state_front_blanks)
+        if temp1 == 0 or temp2 == 0: return temp1, temp2, time.time()-start_time
         inv = self._inversions_count(board1d)
         X_back.append(inv)
         X_front.append(inv)
         X_back.append(self._sum_incorrect_weight(board, self.goal_state_back_blanks))
         X_front.append(self._sum_incorrect_weight(board, self.goal_state_front_blanks))
-        manhattan_front, manhattan_back = self._calculate_slide_heuristic(board)
+        manhattan_front, manhattan_back, _ = self._calculate_slide_heuristic(board)
         X_back.append(manhattan_back)
         X_front.append(manhattan_front)
         X_front.append(manhattan_front + self._linear_conflict(board, self.goal_state_front_blanks))
@@ -162,14 +163,14 @@ class Algorithm(ABC):
         location_2 = self.goal_state_front_blanks[value] if front else self.goal_state_back_blanks[value]
         return abs(location[0] - location_2[0]) + abs(location[1] - location_2[1])
     
-    def _count_correct_tiles(self, board, goal):
+    def _count_incorrect_tiles(self, board, goal):
         count = 0
 
         for i in range(len(board)):
             for j in range(len(board[i])):
                 cur_tile = board[i][j]
                 if cur_tile == 0: continue
-                if i == goal[cur_tile][0] and j == goal[cur_tile][1]: count += 1
+                if i != goal[cur_tile][0] or j != goal[cur_tile][1]: count += 1
             
         return count
     

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     y = board_df['astar'].values
     
     # Create a Lasso regression model
-    model = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
+    model = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)
     
     # Fit and evaluate the model using 10-fold cross-validation
     scores = cross_validate(model, X, y, cv=10, scoring=["r2","neg_root_mean_squared_error"])
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     
     # Save the model as a pickle file
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    filename = 'models/random-forest-2.pkl'
+    filename = 'models/random-forest-3.pkl'
     if os.path.isfile(os.path.join(dir_path,filename)):
         print(f'{"Model exists!" :=<100}')
     else:

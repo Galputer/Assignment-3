@@ -126,7 +126,7 @@ def feature_engineer(df: pd.DataFrame):
     df['hamming'] = df.apply(lambda x: min(x.hamming_1, x.hamming_2), axis=1)
     
     # return df[['tile_sum','correct_1','correct_2','correct_count','incorrect_sum_1','incorrect_sum_2','incorrect_sum','manhattan_1','manhattan_2','manhattan','conflicts_1','conflicts_2','conflicts']]
-    return df[['correct_count','inversion','incorrect_sum','manhattan','conflicts','hamming']]
+    return df[['inversion','incorrect_sum','manhattan','conflicts','hamming']]
 
 if __name__ == "__main__":
 
