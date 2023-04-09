@@ -58,7 +58,7 @@ class Algorithm(ABC):
         pass
     
     def load_model(self):
-        model_path = Path(os.path.dirname(os.path.realpath(__file__))).parent / "models" / "random-forest-2.pkl"
+        model_path = Path(os.path.dirname(os.path.realpath(__file__))).parent / "models" / "lasso-2.pkl"
         loaded_model = pickle.load(open(model_path, 'rb'))
         return loaded_model
     
@@ -99,18 +99,18 @@ class Algorithm(ABC):
         # ['correct_count','inversion','incorrect_sum','manhattan','conflicts','hamming']
         X_front = []
         X_back = []
-        X_back.append(self._count_correct_tiles(board, self.goal_state_back_blanks))
-        X_front.append(self._count_correct_tiles(board, self.goal_state_front_blanks))
+        # X_back.append(self._count_correct_tiles(board, self.goal_state_back_blanks))
+        # X_front.append(self._count_correct_tiles(board, self.goal_state_front_blanks))
         inv = self._inversions_count(board1d)
         X_back.append(inv)
         X_front.append(inv)
-        X_back.append(self._sum_incorrect_weight(board, self.goal_state_back_blanks))
-        X_front.append(self._sum_incorrect_weight(board, self.goal_state_front_blanks))
-        manhattan_front, manhattan_back = self._calculate_slide_heuristic(board)
-        X_back.append(manhattan_back)
-        X_front.append(manhattan_front)
-        X_front.append(manhattan_front + self._linear_conflict(board, self.goal_state_front_blanks))
-        X_back.append(manhattan_back + self._linear_conflict(board, self.goal_state_back_blanks))
+        # X_back.append(self._sum_incorrect_weight(board, self.goal_state_back_blanks))
+        # X_front.append(self._sum_incorrect_weight(board, self.goal_state_front_blanks))
+        # manhattan_front, manhattan_back = self._calculate_slide_heuristic(board)
+        # X_back.append(manhattan_back)
+        # X_front.append(manhattan_front)
+        # X_front.append(manhattan_front + self._linear_conflict(board, self.goal_state_front_blanks))
+        # X_back.append(manhattan_back + self._linear_conflict(board, self.goal_state_back_blanks))
 
         X_back.append(self._hamming_distance(board, self.goal_state_back_blanks))
         X_front.append(self._hamming_distance(board, self.goal_state_front_blanks))
@@ -118,7 +118,7 @@ class Algorithm(ABC):
         y = model.predict([X_front,X_back])
         y_front = y[0]
         y_back = y[1]
-        return min(manhattan_front,y_front), min(manhattan_back,y_back)
+        return y_front, y_back
     
     def _calculate_teleport_heuristic(self, board):
         front_heuristic = 0

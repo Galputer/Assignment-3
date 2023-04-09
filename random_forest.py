@@ -21,8 +21,8 @@ if __name__ == "__main__":
     
     print(f'{"Running random forest" :=<100}')
     # Select the relevant features and target variable
-    X = engineered_df.values
-    y = board_df['astar'].values
+    X = engineered_df
+    y = board_df['astar']
     
     # Create a Lasso regression model
     model = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
@@ -59,12 +59,12 @@ if __name__ == "__main__":
     #draw tree graph
     # Visualize the first decision tree in the Random Forest
     plt.figure(figsize=(20, 10))
-    plot_tree(model.estimators_[0], feature_names=engineered_df.columns, filled=True)
+    plot_tree(model.estimators_[0], feature_names=X.columns, filled=True)
     plt.show()
 
     # Visualize the feature importances of the Random Forest
     plt.figure(figsize=(10, 6))
-    plt.bar(engineered_df.columns, model.feature_importances_)
+    plt.bar(X.columns, model.feature_importances_)
     plt.xticks(rotation=90)
     plt.xlabel('Features')
     plt.ylabel('Importance')
