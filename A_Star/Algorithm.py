@@ -125,7 +125,7 @@ class Algorithm(ABC):
         y = model.predict([X_front,X_back])
         y_front = y[0]
         y_back = y[1]
-        return min(manhattan_front,y_front), min(manhattan_back,y_back), time.time()-start_time
+        return y_front, y_back, time.time()-start_time
     
     def _calculate_teleport_heuristic(self, board):
         start_time = time.time()
